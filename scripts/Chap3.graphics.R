@@ -145,17 +145,18 @@ cumsum(c(1, 2, 3, 4))
 with(ruth.data, plot(Age, cumsum(HR), type="l", lty=3, lwd=2,
                      xlab="Age", ylab="Career Home Runs",
                      xlim=c(18, 45), ylim=c(0, 800)))
-with(aaron.data, lines(Age, cumsum(HR), lty=2, lwd=2))
+with(aaron.data, lines(Age, cumsum(HR), lty=2, lwd=2)) # lty changes the line style
 with(bonds.data, lines(Age, cumsum(HR), lty=1, lwd=2))
 with(arod.data, lines(Age, cumsum(HR), lty=4, lwd=2))
 legend(20, 700, legend=c("Bonds", "Aaron", "Ruth", "ARod"),
-       lty=1 : 4, lwd=2)
+       lty=1 : 4, lwd=2) 
+# args to legend: x,y coords; labels for the legends; vector of lty styles (matching above); lwd=line width
 
 # Section 3.9 The 1998 Home Run Race
 
-data1998 <- read.csv("all1998.csv", header=FALSE)
-fields <- read.csv("fields.csv")
-names(data1998) <- fields[, "Header"]
+data1998 <- read.csv("all1998.csv", header=FALSE) # varnames are not in 1st row of this CSV
+fields <- read.csv("fields.csv") # extracts the variable names for this dataset 
+names(data1998) <- fields[, "Header"] # sets the variable names for data1998 to the field names in fields.csv
 
 retro.ids <- read.csv("retrosheetIDs.csv")
 sosa.id <- as.character(subset(retro.ids,
