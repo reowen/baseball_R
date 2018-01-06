@@ -16,7 +16,7 @@ hof$MidCareer <- with(hof, (From + To) / 2)
 
 hof$Era <- cut(hof$MidCareer,
         breaks = c(1800, 1900, 1919, 1941, 1960, 1976, 1993, 2050),
-        labels = c("19th Century", "Lively Ball", "Dead Ball",
+        labels = c("19th Century", "Dead Ball", "Lively Ball",
                     "Integration", "Expansion", "Free Agency", 
                     "Long Ball"))
 
@@ -53,10 +53,10 @@ dotchart(hof.500$OPS, labels=hof.500$X, xlab="OPS")
 
 # Section 3.5 Numeric Variable: Stripchart and Histogram
 
-windows(width=7, height=3.5)
+# windows(width=7, height=3.5) # returns an error
 stripchart(hof$MidCareer, method="jitter", pch=1, 
            xlab="Mid Career")
-dev.off()
+# Sdev.off()
 
 hist(hof$MidCareer, xlab="Mid Career", main="")
 
@@ -72,6 +72,7 @@ with(hof, identify(MidCareer, OPS, X, n=4))
   #... then press ESC
 
 with(hof, plot(OBP, SLG))
+# with(hof, identify(OBP, SLG, X, n=4))
 
 with(hof, plot(OBP, SLG, xlim=c(0.25, 0.50), 
                ylim=c(0.28, 0.75), pch=19,
@@ -99,9 +100,9 @@ hof$HR.Rate <- with(hof, HR / AB)
 
 stripchart(HR.Rate ~ Era, data=hof)
 
-par(plt = c(.2, .94, .145, .883))
+par(plt = c(.2, .94, .145, .883)) # changes the boundaries of the plot region. the .2 adds space to the left, so the labels can fit 
 stripchart(HR.Rate ~ Era, data = hof, 
-          method="jitter", pch=1, las=2)
+          method="jitter", pch=1, las=2) # jitter staggers the points, las=2 makes the labels horizontal instead of vertical
 
 par(plt=c(.2, .94, .145, .883))
 boxplot(HR.Rate ~ Era, data=hof, las=2,
