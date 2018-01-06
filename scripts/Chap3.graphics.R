@@ -10,7 +10,7 @@
 
 # Section 3.1 Introduction
 
-hof <- read.csv("hofbatting.csv")
+hof <- read.csv("hofbatting.csv") 
 
 hof$MidCareer <- with(hof, (From + To) / 2)
 
