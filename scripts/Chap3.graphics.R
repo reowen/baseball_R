@@ -16,7 +16,7 @@ hof$MidCareer <- with(hof, (From + To) / 2)
 
 hof$Era <- cut(hof$MidCareer,
         breaks = c(1800, 1900, 1919, 1941, 1960, 1976, 1993, 2050),
-        labels = c("19th Century", "Lively Ball", "Dead Ball",
+        labels = c("19th Century", "Dead Ball", "Lively Ball",
                     "Integration", "Expansion", "Free Agency", 
                     "Long Ball"))
 
