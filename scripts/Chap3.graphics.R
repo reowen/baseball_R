@@ -127,7 +127,7 @@ bonds.info <- getinfo("Barry", "Bonds")
 arod.info <- getinfo("Alex", "Rodriguez")
 ruth.info
 
-batting <- read.csv("lahman/Batting.csv")
+batting <- read.csv("Batting.csv")
 
 ruth.data <- subset(batting, playerID == ruth.info$name.code)
 ruth.data$Age <- ruth.data$yearID - ruth.info$byear
