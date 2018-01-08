@@ -8,7 +8,7 @@
 
 # Section 4.2  The Teams Table in Lahman's Database
 
-teams <- read.csv("lahman/teams.csv")
+teams <- read.csv("lahman/Teams.csv")
 tail(teams)
 
 myteams <- subset(teams, yearID > 2000)[ , c("teamID", "yearID",
@@ -16,6 +16,7 @@ myteams <- subset(teams, yearID > 2000)[ , c("teamID", "yearID",
 
 tail(myteams)
 
+# Runs Differential -- runs scored minus runs allowed 
 myteams$RD <- with(myteams, R - RA)
 myteams$Wpct <- with(myteams, W / (W + L))
 
@@ -27,10 +28,10 @@ plot(myteams$RD, myteams$Wpct,
 
 linfit <- lm(Wpct ~ RD, data=myteams)
 
-abline(a=coef(linfit)[1], b=coef(linfit)[2], lwd=2)
+abline(a=coef(linfit)[1], b=coef(linfit)[2], lwd=2) # a=intercept, b=slope; coef() extracts model coefficients
 
-myteams$linWpct <- predict(linfit)
-myteams$linResiduals <- residuals(linfit)
+myteams$linWpct <- predict(linfit) # cache the predicted values 
+myteams$linResiduals <- residuals(linfit) # cache the residuals (diff b/w predicted and actual)
 
 plot(myteams$RD, myteams$linResiduals,
   xlab="run differential",
@@ -42,9 +43,11 @@ text(88, -.0733, "CLE '06", pos=4, cex=.8)
 
 mean(myteams$linResiduals)
 
-linRMSE <- sqrt(mean(myteams$linResiduals ^ 2))
-linRMSE
+linRMSE <- sqrt(mean(myteams$linResiduals ^ 2)) # calc the root mean squared error 
+linRMSE 
 
+
+# approx 2/3 of residuals fall b/w -RSME and +RSME, and 95% b/w 2*(+/-)RSME (see below)
 nrow(subset(myteams, abs(linResiduals) < linRMSE)) /
   nrow(myteams)
 
