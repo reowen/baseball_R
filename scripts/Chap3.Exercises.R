@@ -135,6 +135,46 @@ legend(20, 4000, legend=c("Williams", "Cobb", "Rose"),
 ### 7. Working with the Retrosheet play-by-play dataset ###
 ########################################################### 
 
+# Create the McGuire and Sosa dataframes 
+data1998 <- read.csv("all1998.csv", header=FALSE) # varnames are not in 1st row of this CSV
+fields <- read.csv("fields.csv") # extracts the variable names for this dataset 
+names(data1998) <- fields[, "Header"] # sets the variable names for data1998 to the field names in fields.csv
+
+retro.ids <- read.csv("retrosheetIDs.csv")
+sosa.id <- as.character(subset(retro.ids,
+                               FIRST=="Sammy" & LAST=="Sosa")$ID)
+
+mac.id <- as.character(subset(retro.ids,
+                              FIRST=="Mark" & LAST=="McGwire")$ID)
+
+sosa.data <- subset(data1998, BAT_ID == sosa.id)
+mac.data <- subset(data1998, BAT_ID == mac.id)
+
+# Restrict to only the plate appearances where a batting event occurred 
+mac.data <- subset(mac.data, BAT_EVENT_FL == TRUE) 
+sosa.data <- subset(sosa.data, BAT_EVENT_FL == TRUE)  
+
+# Create a new variable that gives the number of plate appearances 
+mac.data$PA <- 1:nrow(mac.data) 
+sosa.data$PA <- 1:nrow(sosa.data)  
+
+# Return the number of plate appearances where there was a homerun 
+mac.HR.PA <- mac.data$PA[mac.data$EVENT_CD == 23] 
+sosa.HR.PA <- sosa.data$PA[sosa.data$EVENT_CD == 23] 
 
 
+# Calculate the spacings between at-bats 
+mac.spacings <- diff(c(0,mac.HR.PA)) # pre-pends a 0 to the beginning of the list, then computes differences
+sosa.spacings <- diff(c(0,sosa.HR.PA))  
 
+# Use the summary() and hist() functions to compare the spacings between HR's for each player 
+summary(mac.spacings)
+hist(mac.spacings, xlab="Spacings between home runs", main="", breaks=seq(1,41,by=2))
+
+summary(sosa.spacings)
+hist(sosa.spacings, xlab="Spacings between home runs", main="", breaks=seq(1,49,by=2)) 
+
+pdf("../output/sosa_mac_spacings.pdf")
+hist(mac.spacings, xlab="Spacings between home runs", main="", breaks=seq(1,41,by=2))
+hist(sosa.spacings, xlab="Spacings between home runs", main="", breaks=seq(1,49,by=2)) 
+dev.off()
