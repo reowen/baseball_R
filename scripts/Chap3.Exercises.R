@@ -90,6 +90,51 @@ with(hofpitching, identify(MidYear, WAR.season, X, n=4, pos=1, cex=0.7))
 ### 6. Working with the Lahman Batting Dataset ###
 ################################################## 
 
+## A. Read the batting and master CSVs into R 
+batting = read.csv('Batting.csv')
+master = read.csv('lahman/Master.csv')
+
+## B & C. Generate dataframes for Ty Cobb, Ted Williams, and Pete Rose (add age) 
+getinfo <- function(firstname, lastname){
+  playerline <- subset(master,
+                       nameFirst==firstname & nameLast==lastname)
+  name.code <- as.character(playerline$playerID)[[1]]
+  birthyear <- playerline$birthYear[[1]]
+  birthmonth <- playerline$birthMonth[[1]]
+  birthday <- playerline$birthDay[[1]]
+  byear <- ifelse(birthmonth <= 6, birthyear, birthyear + 1)[[1]]
+  list(name.code=name.code, byear=byear)}
+
+cobb.info <- getinfo("Ty", "Cobb")
+williams.info <- getinfo("Ted", "Williams")
+rose.info <- getinfo("Pete", "Rose")
+
+gen_df <- function(info){
+  df <- subset(batting, playerID == info$name.code) 
+  df <- df[order(df$yearID), ]
+  df$Age <- df$yearID - info$byear 
+  
+  df$Cum_H <- cumsum(df$H)
+  return(df)
+}
+cobb.data <- gen_df(cobb.info)
+williams.data <- gen_df(williams.info)
+rose.data <- gen_df(rose.info)
+
+## D. Plot the cumulative hit totals, by age, for Pete Rose 
+with(rose.data, plot(Age, Cum_H, type='l', lty=3, lwd=2, 
+                     xlab="Age", ylab="Career Hits", 
+                     xlim=c(18,45), ylim=c(0,5000))) 
+with(cobb.data, lines(Age, Cum_H, lty=2, lwd=2)) # lty changes the line style
+with(williams.data, lines(Age, Cum_H, lty=1, lwd=2))
+legend(20, 4000, legend=c("Williams", "Cobb", "Rose"),
+       lty=1 : 3, lwd=2) 
+
+
+###########################################################
+### 7. Working with the Retrosheet play-by-play dataset ###
+########################################################### 
+
 
 
 
