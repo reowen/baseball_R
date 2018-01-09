@@ -109,7 +109,7 @@ identify(teams2011$onerunW, teams2011$pytResiduals,
   #...identify data points by mouse-clickin on the plot
   #...then press ESC to finish
 
-pit <- read.csv("lahman/pitching.csv")
+pit <- read.csv("lahman/Pitching.csv")
 top_closers <- subset(pit, GF > 50 & ERA < 2.5)[ ,c("playerID",
   "yearID", "teamID")]
 
