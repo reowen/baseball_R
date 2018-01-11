@@ -1,4 +1,6 @@
 
+library(dplyr) 
+
 #####################################################################################
 ## 1. Relationship Between Winning Percentage, and Run Differential Across Decades ##
 #####################################################################################
@@ -67,8 +69,42 @@ with(teams.1800s, lines(lowess(RD, pytResiduals, f=0.3)))
 ## 3. Exploring the Manager Effect in Baseball ## 
 ################################################# 
 
+# Extract the team data for 2000 - 20009 
+teams.2000s <- genData(2000, 2009)[[1]]  
+
+# Set directory for the Retrosheet data, extract filenames 
+retrodir <- '../../data/Retrosheet' 
+files <- list.files(path=retrodir, pattern="*.TXT", full.names=T, recursive=FALSE)  
+
+# Read the data in the first file 
+retro2000 <- read.csv(files[1], header=FALSE) 
+
+# Append the data from the other files into the first file 
+for (file in files[-1]){
+  df <- read.csv(file, header=FALSE)
+  retro2000 <- rbind(retro2000, df) 
+  rm(df)
+}
+
+# Set the header names 
+gl_header <- names(read.csv('game_log_header.csv')) 
+names(retro2000) <- gl_header 
 
 
+# Extract year 
+retro2000$yearID <- with(retro2000, substr(as.character(Date), 1, 4)) 
+retro2000$teamID <- retro2000$HomeTeam 
+
+# Extract manager info for each team, year 
+cols <- c('yearID', 'teamID', 'HomeManagerID', 'HomeManagerName')
+managers <- retro2000[, cols] %>% distinct() 
+
+teams.2000s <- merge(teams.2000s, managers, by=c('yearID', 'teamID')) 
 
 
+# Find the best/worst performing managers 
+teams.2000s <- teams.2000s[order(teams.2000s$pytResiduals, decreasing=TRUE), ] 
 
+cols <- c('yearID', 'teamID', 'HomeManagerName', 'pytResiduals')
+head(teams.2000s[, cols], n=10)  
+tail(teams.2000s[, cols], n=10)  
