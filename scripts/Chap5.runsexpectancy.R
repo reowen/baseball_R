@@ -14,25 +14,33 @@ data2011 <- read.csv("all2011.csv", header=FALSE)
 fields <- read.csv("fields.csv")
 names(data2011) <- fields[, "Header"]
 
+# total runs at any point in the game 
 data2011$RUNS <- with(data2011, AWAY_SCORE_CT + HOME_SCORE_CT)
+
+# unique ID for each half inning 
 data2011$HALF.INNING <- with(data2011, 
                             paste(GAME_ID, INN_CT, BAT_HOME_ID))
 
+# Compute the total runs scored in each half inning 
 data2011$RUNS.SCORED <- with(data2011, (BAT_DEST_ID > 3) +
   (RUN1_DEST_ID > 3) + (RUN2_DEST_ID > 3) + (RUN3_DEST_ID > 3))
 
 RUNS.SCORED.INNING <- aggregate(data2011$RUNS.SCORED, 
                         list(HALF.INNING = data2011$HALF.INNING), sum)
 
+# Find the total game runs at the beginning of each half inning 
 RUNS.SCORED.START <- aggregate(data2011$RUNS, 
                        list(HALF.INNING = data2011$HALF.INNING), "[", 1)
 
+# Find the max score for each half inning (score @ beginning, plus score @ end), merge with master df 
 MAX <- data.frame(HALF.INNING=RUNS.SCORED.START$HALF.INNING)
 MAX$x <- RUNS.SCORED.INNING$x + RUNS.SCORED.START$x
 data2011 <- merge(data2011, MAX)
 N <- ncol(data2011)
-names(data2011)[N] <- "MAX.RUNS"
+names(data2011)[N] <- "MAX.RUNS" # Names the new column (at the end)
 
+# (ROI = remainder of inning) Calcs the runs scores in the remainder of the inning, by subtracting runs scored 
+# during the play, from the runs scored by the end of the half inning 
 data2011$RUNS.ROI <- data2011$MAX.RUNS - data2011$RUNS
 
 ##################################################
@@ -44,41 +52,53 @@ get.state <- function(runner1, runner2, runner3, outs){
   paste(runners, outs)                      
 }
 
+# Flag if bases 1,2, or 3 are occupied by a runner @ plate appearance, store as a var 
+# e.g. '011 2' means runners on 2 & 3, 2 outs 
 RUNNER1 <- ifelse(as.character(data2011[,"BASE1_RUN_ID"])=="", 0, 1)
 RUNNER2 <- ifelse(as.character(data2011[,"BASE2_RUN_ID"])=="", 0, 1)
 RUNNER3 <- ifelse(as.character(data2011[,"BASE3_RUN_ID"])=="", 0, 1)
-data2011$STATE <- get.state(RUNNER1, RUNNER2, RUNNER3, data2011$OUTS_CT)
+data2011$STATE <- get.state(RUNNER1, RUNNER2, RUNNER3, data2011$OUTS_CT) 
 
+# We only consider plays with a change in runners on base, # outs, or runs scored 
+# Flag if 1st, 2nd, or 3rd base are occupied after the play 
 NRUNNER1 <- with(data2011, as.numeric(RUN1_DEST_ID==1 | BAT_DEST_ID==1))
 NRUNNER2 <- with(data2011, as.numeric(RUN1_DEST_ID==2 | RUN2_DEST_ID==2 | BAT_DEST_ID==2))
 NRUNNER3 <- with(data2011, as.numeric(RUN1_DEST_ID==3 | RUN2_DEST_ID==3 |
   RUN3_DEST_ID==3 | BAT_DEST_ID==3))
-NOUTS <- with(data2011, OUTS_CT + EVENT_OUTS_CT)
+NOUTS <- with(data2011, OUTS_CT + EVENT_OUTS_CT) # num of outs after the play 
 
+# Return the # runners on base, and outs, after the play 
 data2011$NEW.STATE <- get.state(NRUNNER1, NRUNNER2, NRUNNER3, NOUTS)
 
+# Subset the df, to only contain plays with state changes 
 data2011 <- subset(data2011, (STATE!=NEW.STATE) | (RUNS.SCORED>0))
 
+# Remove any "incomplete" innings with <3 outs (e.g., 9th inning ends early b/c of runs scored to win)
 library(plyr)
 data.outs <- ddply(data2011, .(HALF.INNING), summarize,
                   Outs.Inning = sum(EVENT_OUTS_CT))
 data2011 <- merge(data2011, data.outs)
 data2011C <- subset(data2011, Outs.Inning == 3)
 
+# Compute the expected # runs scores in the rest of the inning 
 RUNS <- with(data2011C, aggregate(RUNS.ROI, list(STATE), mean))
 RUNS$Outs <- substr(RUNS$Group, 5, 5)
 RUNS <- RUNS[order(RUNS$Outs), ]
 
-RUNS.out <- matrix(round(RUNS$x, 2), 8, 3)
+# Create the matrix 
+RUNS.out <- matrix(round(RUNS$x, 2), 8, 3) # b/c it's sorted by outs, and there are 8 states, this puts the outs into cols
 dimnames(RUNS.out)[[2]] <- c("0 outs", "1 out", "2 outs")
 dimnames(RUNS.out)[[1]] <- c("000", "001", "010", "011", "100", "101", "110", "111")
 
+# For comparison, show the 2002 matrix 
 RUNS.2002 <- matrix(c(.51, 1.40, 1.14,  1.96, .90, 1.84, 1.51, 2.33,
                .27,  .94,  .68,  1.36, .54, 1.18,  .94, 1.51,
                .10,  .36,  .32,   .63, .23, .52,   .45, .78),
                8, 3)
 dimnames(RUNS.2002) <- dimnames(RUNS.out)
 
+# The left side shows 2011, the right 2002: 
+# displays the avg # runs a team will score in the remainder of the half inning 
 cbind(RUNS.out, RUNS.2002)
 
 ##################################################
