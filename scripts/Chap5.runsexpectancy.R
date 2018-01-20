@@ -227,14 +227,14 @@ subset(d.homerun, RUNS.VALUE==max(RUNS.VALUE))[1,
       c("STATE", "NEW.STATE", "RUNS.VALUE")] # bases loaded with 2 outs 
 
 # Overall run value of a homerun: the mean run value 
-mean.HR <- mean(d.homerun$RUNS.VALUE)
+mean.HR <- mean(d.homerun$RUNS.VALUE) 
 mean.HR
 
 abline(v = mean.HR, lwd=3) # draw the mean value on the histogram 
 text(1.5, 5, "Mean Runs Value", pos=4)
 
 #### Calculate the run value of a single #### 
-d.single <- subset(data2011, EVENT_CD == 20)
+d.single <- subset(data2011, EVENT_CD == 20) 
 #library(MASS)
 truehist(d.single$RUNS.VALUE)
 
@@ -246,7 +246,7 @@ subset(d.single, d.single$RUNS.VALUE==
 subset(d.single, d.single$RUNS.VALUE == min(d.single$RUNS.VALUE))[
   , c("STATE", "NEW.STATE", "RUNS.VALUE")]
 
-mean.single <- mean(d.single$RUNS.VALUE)
+mean.single <- mean(d.single$RUNS.VALUE) 
 mean.single
 abline(v = mean.single, lwd=3)
 text(.5, 5, "Mean Runs Value", pos=4)
