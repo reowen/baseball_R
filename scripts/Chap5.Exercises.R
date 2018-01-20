@@ -1,4 +1,6 @@
 
+# Import all of the objects from the Chapter 5 notes 
+source('../scripts/Chap5.runsexpectancy.R')
 
 ###########################
 ## 1. Run Values of Hits ##
@@ -68,6 +70,17 @@ results
 ## 2. Value of Different Ways of Reaching First Base ##
 #######################################################
 
+## Use run values to compare the value of a single, walk, and hit-by-pitch when there is a single runner on first base 
+# single: EVENT_CD == 20; walk: EVENT_CD == 14; HBP: EVENT_CD == 16 
 
-
+genMean <- function(cd, pos){
+  mu <- mean(subset(data2011, EVENT_CD == cd & substr(STATE, 1, 3) == pos)$RUNS.VALUE)
+  return(round(mu, 2))
+}
+mean.single <- genMean(20, "100")
+mean.BB <- genMean(14, "100")
+mean.HBP <- genMean(16, "100")
+results <- matrix(c(mean.single, mean.BB, mean.HBP), 3, 1) 
+dimnames(results)[[1]] <- c("Single", "Walk", "Hit by Pitch") 
+results
 
