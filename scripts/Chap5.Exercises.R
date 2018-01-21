@@ -1,4 +1,5 @@
 
+library(plyr)
 # Import all of the objects from the Chapter 5 notes 
 source('../scripts/Chap5.runsexpectancy.R')
 
@@ -83,4 +84,56 @@ mean.HBP <- genMean(16, "100")
 results <- matrix(c(mean.single, mean.BB, mean.HBP), 3, 1) 
 dimnames(results)[[1]] <- c("Single", "Walk", "Hit by Pitch") 
 results
+
+
+################################################
+## 3. Comparing Two Players with Similar OBPs ##
+################################################
+
+genPlayerDF <- function(id){
+  df <- subset(data2011, BAT_ID == id & BAT_EVENT_FL == TRUE) 
+  df$RUNNERS <- substr(df$STATE, 1, 3) 
+  
+  agg <- ddply(df, 'RUNNERS', summarize, 
+               RUNS = sum(RUNS.VALUE), 
+               PA = length(RUNS.VALUE))
+  return(df)}
+
+## Compare the run values of Rickie Weeks ("weekr001") and Michael Bourne ("bourm001") 
+## Which player was more valuable to his team? 
+
+weeks <- genPlayerDF("weekr001")
+bourne <- genPlayerDF("bourm001") 
+
+sum(weeks$RUNS)
+sum(bourne$RUNS)
+
+## Can you explain the difference in values in terms of traditional batting stats such as AVG, SLG, or OBP? 
+library(Lahman) 
+batting <- subset(battingStats(), yearID == 2011 & playerID %in% c('weeksri01', 'bournmi01'))  
+batting2 <- ddply(batting, 'playerID', summarize, 
+                 H = sum(H), 
+                 AB = sum(AB), 
+                 DBLS = sum(X2B), 
+                 TPLS = sum(X3B), 
+                 HR = sum(HR), 
+                 BB = sum(BB), 
+                 HBP = sum(HBP), 
+                 SF = sum(SF), OBP_x=sum(OBP), SlugPct = sum(SlugPct))
+
+batting2$BA <- with(batting2, round(H / AB, 3))
+batting2$SLG <- with(batting2, round((H + DBLS + 2*TPLS + 3*HR) / AB, 3))
+batting2$OBP <- with(batting2, round((H + BB + HBP) / (AB + BB + HBP + SF), 3))
+
+batting2$RV <- with(batting2, ifelse(playerID == 'bournmi01', sum(bourne$RUNS), sum(weeks$RUNS))) 
+
+display_cols <- c('playerID', 'BA', 'SLG', 'OBP', 'RV') 
+batting2[, display_cols] # Weeks has a higher run value, due to his higher slugging percentage 
+
+
+###################################################
+## 4. Create Probability of Scoring a Run Matrix ##
+###################################################
+
+
 
