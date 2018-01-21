@@ -181,3 +181,25 @@ runs <- ddply(d.single, 'POS', summarize,
               RUNS_PR = round(mean(RUNS_F), 3))
 runs # probability a run is scored, is 0.639 
 
+
+####################################################
+## 6. Hitting Evaluation of Players by Run Values ##
+####################################################
+
+## Let's look into David Ortiz 
+Roster <- read.csv("roster2011.csv")
+papi.id <- subset(Roster, First.Name == "David" &
+                      Last.Name == "Ortiz")$Player.ID
+papi.id <- as.character(papi.id)
+papi <- subset(data2011, BAT_ID==papi.id)
+papi <- subset(papi, BAT_EVENT_FL==TRUE) 
+
+# Tabulate how often Pujols was batting with runners in scoring position, etc...
+papi$RUNNERS <- substr(papi$STATE, 1, 3)
+table(papi$RUNNERS)
+
+# Visualize how Pujols performed with runners in each of these states 
+with(papi, stripchart(RUNS.VALUE ~ RUNNERS, vertical=TRUE, jitter=0.2,
+                        xlab="RUNNERS", method="jitter", pch=1, cex = 0.8))
+abline(h=0)
+
