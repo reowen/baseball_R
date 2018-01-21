@@ -81,7 +81,7 @@ data2011 <- merge(data2011, data.outs)
 data2011C <- subset(data2011, Outs.Inning == 3)
 
 # Compute the expected # runs scores in the rest of the inning 
-RUNS <- with(data2011C, aggregate(RUNS.ROI, list(STATE), mean))
+RUNS <- with(data2011C, aggregate(RUNS.ROI, list(STATE), mean)) 
 RUNS$Outs <- substr(RUNS$Group, 5, 5)
 RUNS <- RUNS[order(RUNS$Outs), ]
 

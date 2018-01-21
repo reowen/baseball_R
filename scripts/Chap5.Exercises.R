@@ -135,5 +135,20 @@ batting2[, display_cols] # Weeks has a higher run value, due to his higher slugg
 ## 4. Create Probability of Scoring a Run Matrix ##
 ###################################################
 
+## Compute the proportion of times that at least one run was scored, for each of the 24 possible position/out states 
+
+data2011b <- subset(data2011, BAT_EVENT_FL == TRUE) 
+data2011b$RUNS_F <- data2011b$RUNS.SCORED > 0 
+
+runs <- ddply(data2011b, 'STATE', summarize, 
+              RUNS_PR = round(mean(RUNS_F), 3))
+runs$Outs <- substr(runs$STATE, 5, 5)
+runs <- runs[order(runs$Outs), ] 
+
+# Create the matrix 
+runs.out <- matrix(runs$RUNS_PR, 8, 3) # b/c it's sorted by outs, and there are 8 states, this puts the outs into cols
+dimnames(runs.out)[[2]] <- c("0 outs", "1 out", "2 outs")
+dimnames(runs.out)[[1]] <- c("000", "001", "010", "011", "100", "101", "110", "111")
+runs.out
 
 
