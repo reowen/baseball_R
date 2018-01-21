@@ -152,3 +152,32 @@ dimnames(runs.out)[[1]] <- c("000", "001", "010", "011", "100", "101", "110", "1
 runs.out
 
 
+#########################################
+## 5. Runner Advancement with a Single ##
+#########################################
+
+## a. select the plays where a single was hit 
+d.single <- subset(data2011, EVENT_CD == 20)
+
+## b. construct a table of frequencies of the vars STATE and NEW.STATE 
+d.single$POS <- substr(d.single$STATE, 1, 3)
+d.single$NEW.POS <- substr(d.single$NEW.STATE, 1, 3)
+
+table(d.single$POS, d.single$NEW.POS)
+
+
+## c. suppose there is a single runner on first base: using the above table, is it more likely for 
+##    the lead runner to move to second, or to third base? 
+
+# Lead runner is most likely to advance to second base 
+
+## d. suppose instead there are runners on first and second. where do they move? 
+
+# they mostly stay on 1st and second (i.e. they throw out the lead runner), or they load the bases 
+
+## compute the probability a run is scored on the play: 
+d.single$RUNS_F <- d.single$RUNS.SCORED > 0 
+runs <- ddply(d.single, 'POS', summarize, 
+              RUNS_PR = round(mean(RUNS_F), 3))
+runs # probability a run is scored, is 0.639 
+
