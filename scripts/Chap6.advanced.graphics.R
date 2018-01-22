@@ -12,7 +12,7 @@
 
 # Section 6.1 Introduction
 
-load("balls_strikes_count.Rdata")
+load("/home/russell/Documents/Baseball/baseball_R/data/balls_strikes_count.RData")
 
 # Section 6.2 The lattice Package
 
@@ -42,7 +42,7 @@ densityplot(~ speed | pitch_type, data = verlander, layout=c(1,5)
 
 densityplot(~ speed, data = verlander, groups = pitch_type,
             plot.points = FALSE,
-            auto.key = TRUE)
+            auto.key = TRUE) # auto.key=TRUE creates the legend 
 
 # scatterplots of speed trends
 
@@ -57,7 +57,7 @@ F4verl$gameDay <- as.integer(format(F4verl$gamedate, format="%j"))
 # mean speed by day of the year
 
 dailySpeed <- aggregate(speed ~ gameDay + season, data = F4verl
-                        , FUN = mean)
+                        , FUN = mean) # average speeds, grouped by day of the year and season 
 
 # scatter plot
 
@@ -88,6 +88,7 @@ dotplot(factor(season) ~ speed, groups = pitch_type,
         data = avgspeedFC,
         pch = c("C", "F"), cex = 2)
 
+
 # panel function: speed trend in the game
 
 # average fastball speed by pitch count and season
@@ -104,21 +105,21 @@ avgSpeedComb <- mean(F4verl$speed)
 xyplot(speed ~ pitches | factor(season),
        data = avgSpeed)
 
-# add the refenece lines (and text + arrows)
+# add the reference lines (and text + arrows)
 
 xyplot(speed ~ pitches | factor(season)
        , data = avgSpeed
        , panel = function(...){
-         panel.xyplot(...)
-         panel.abline(v = 100, lty = "dotted")
-         panel.abline(h = avgSpeedComb)
-         panel.text(25, 100, "avg. speed")
+         panel.xyplot(...) # draws the scatterplots 
+         panel.abline(v = 100, lty = "dotted") # adds the vertical line @ 100 pitches 
+         panel.abline(h = avgSpeedComb) # adds the horizontal line @ 4-year average 
+         panel.text(25, 100, "avg. speed") # adds the "avg. speed" tag 
          panel.arrows(25, 99.5, 0, avgSpeedComb
-                      , length = .1)
+                      , length = .1) # draws the arrows 
        }
 )
 
-# building a lattice plot step-by-step
+# 6.2.8 building a lattice plot step-by-step
 
 # get data on Verlander's 2011 no-hitter
 
