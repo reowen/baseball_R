@@ -134,7 +134,7 @@ xyplot(pz ~ px | batter_hand, data=NoHit, groups=pitch_type,
 
 xyplot(pz ~ px | batter_hand, data=NoHit, groups=pitch_type,
        auto.key = TRUE,
-       aspect = "iso")
+       aspect = "iso") # aspect arg ensures that X axis units are the same as Y axis units 
 
 # limits and labels on axes
 
@@ -225,7 +225,7 @@ p2
 p3 <- p2 + facet_wrap(~ season)
 p3
 
-# prepare data for drawing basepaths
+# prepare data for drawing basepaths (uses pythagorean theorum, with home plate @ origin of graph)
 
 bases <- data.frame(x = c(0, 90/sqrt(2), 0, -90/sqrt(2), 0),
                     y = c(0, 90/sqrt(2), 2 * 90/sqrt(2), 90/sqrt(2), 0)
@@ -236,7 +236,7 @@ bases <- data.frame(x = c(0, 90/sqrt(2), 0, -90/sqrt(2), 0),
 p4 <- p3 + geom_path(data = bases, aes(x = x, y = y))
 p4 +
   geom_segment(x = 0, xend = 300, y = 0, yend = 300) +
-  geom_segment(x = 0, xend = -300, y = 0, yend = 300)
+  geom_segment(x = 0, xend = -300, y = 0, yend = 300) # these are the foul lines 
 
 # combining multiple aesthetics
 
@@ -255,10 +255,12 @@ p4 +
   geom_segment(x = 0, xend = -300, y = 0, yend = 300)
 
 # smooth line with error bands
+library(plyr)
+mean_pitch_spds <- ddply(F4verl, 'season', summarize, mean_speed = mean(speed))
 
 ggplot(F4verl, aes(pitches, speed)) +
   facet_wrap(~ season) +
-  geom_line(stat = "hline", yintercept = "mean", lty = 3) +
+  geom_hline(data=mean_pitch_spds, aes(yintercept=mean_speed), lty = 3) +
   geom_point(aes(pitches, speed),
              data = F4verl[sample(1:nrow(F4verl), 1000),]) +
                geom_smooth(col = "black") +
@@ -283,7 +285,7 @@ ggplot(F4verl, aes(px, pz)) +
 
 # hexagonal binning
 # (requires the package hexbin to be installed)
-
+library(hexbin)
 ggplot(F4verl, aes(px, pz)) +
   stat_binhex() +
   facet_wrap(~ batter_hand) +
