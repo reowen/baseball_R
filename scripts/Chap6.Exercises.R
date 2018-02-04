@@ -84,5 +84,9 @@ cabrera.hits$distance <- computeDistance(cabrera.hits$hitx, cabrera.hits$hity)
 cabrera.hits$gameDay <- as.integer(format(cabrera.hits$gamedate, format="%j")) 
 
 ## D. Scatterplot gameday by distance, with smooth trendline with error bands 
-xyplot()
-
+sp <- ggplot(data = cabrera.hits, aes(x = gameDay, y = distance)) + 
+  xlab("Day of Year") + 
+  ylab("Distance of hit (ft)") + 
+  geom_point(shape=1) + # use hollow circles 
+  geom_smooth() # Add a loess smoothed fit curve with confidence region 
+sp
