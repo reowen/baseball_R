@@ -53,3 +53,18 @@ fb <- ggplot(data = avg.fastball, aes(x = pitches, y = avg.speed, color = pitche
 fb
 
 
+###################################################################
+## 3. Graphical View of the Speeds of Justin Verlander's Pitches ##
+###################################################################
+
+## (A) Use the cut() function to group the verlander$pitches variable into groups of 10 pitches 
+max.break <- ceiling(max(verlander$pitches)/10)*10 # rounds max pitch count up to nearest 10
+verlander$pitch.bin <- with(verlander, cut(pitches, breaks=seq(0,max.break,10)))
+
+## (B) Use lattice to construct a box plot of Verlander's four-seam fastball speed
+F4verl <- subset(verlander, pitch_type == "FF") 
+bwplot(speed~pitch.bin, data=F4verl)
+
+
+
+
