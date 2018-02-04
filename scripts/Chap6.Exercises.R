@@ -26,3 +26,30 @@ densityplot(~ px, data = verlander, groups = batter_hand,
               panel.abline(v=inKzone) 
               panel.abline(v=outKzone)
             })
+
+
+###################################################
+## 2. Comparing Pitch Locations for Two Pitchers ##
+###################################################
+
+## Compare Sanchez and Verlander's ability to maintain fastball speed throughout a game 
+cols <- c('season', 'gamedate', 'pitches', 'speed') 
+sanchez.ff <- sanchez[sanchez$pitch_type %in% c('FF', 'FT'), cols]
+verlander.ff <- verlander[verlander$pitch_type %in% c('FF', 'FT'), cols]
+
+sanchez.ff$pitcher <- "Sanchez" 
+verlander.ff$pitcher <- "Verlander"
+
+fastballs <- rbind(sanchez.ff, verlander.ff)
+avg.fastball <- ddply(fastballs, c('pitcher', 'pitches'), summarize, 
+                      avg.speed = round(mean(speed), 2))
+
+library(ggplot2)
+fb <- ggplot(data = avg.fastball, aes(x = pitches, y = avg.speed, color = pitcher)) + 
+  geom_line() + 
+  xlab("Number of Pitches") + 
+  ylab("Average Fastball Speed") + 
+  scale_x_continuous(breaks=seq(0, 135, 15))
+fb
+
+
