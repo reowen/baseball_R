@@ -66,5 +66,23 @@ F4verl <- subset(verlander, pitch_type == "FF")
 bwplot(speed~pitch.bin, data=F4verl)
 
 
+##################################################
+## 4. Exploring Miguel Cabrera's Slugging Power ##
+##################################################
 
+## A. Subset the cabrera dataframe for instances where he got a hit 
+cabrera.hits <- subset(cabrera, hit_outcome == 'H')
+
+##. B. Create a variable equal to the distance from home plate that the hit was made 
+computeDistance <- function(x, y){
+  sides <- x^2 + y^2 
+  return(round(sqrt(sides), 2))
+}
+cabrera.hits$distance <- computeDistance(cabrera.hits$hitx, cabrera.hits$hity)
+
+## C. Create GameDay variable, equal to 0-365 corresponding to the day of the year. 
+cabrera.hits$gameDay <- as.integer(format(cabrera.hits$gamedate, format="%j")) 
+
+## D. Scatterplot gameday by distance, with smooth trendline with error bands 
+xyplot()
 
